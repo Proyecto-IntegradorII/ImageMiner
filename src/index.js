@@ -16,6 +16,7 @@ import Preguntas from "./pages/home/Questions";
 import SendImage from "./pages/home/UploadImage";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
+
 root.render(
 	<BrowserRouter>
 		<ThemeProvider>
