@@ -1,5 +1,5 @@
 {
-	"name": "taller1-pi2",
+	"name": "image-miner",
 	"version": "0.1.0",
 	"private": true,
 	"dependencies": {
@@ -12,7 +12,6 @@
 		"daisyui": "^2.51.4",
 		"openai": "^4.28.4",
 		"react": "^18.2.0",
-		"react-audio-visualize": "^1.1.3",
 		"react-dom": "^18.2.0",
 		"react-modal": "^3.16.1",
 		"react-router-dom": "^6.22.2",

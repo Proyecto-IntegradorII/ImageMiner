@@ -11,7 +11,6 @@ import reportWebVitals from "./reportWebVitals";
 import Register from "./pages/home/Register";
 import Login from "./pages/home/Login";
 import Leaderboard from "./pages/home/LeaderBoard";
-import MyAudioVisualaizer from "./pages/visualaizers/audio";
 import Results from "./pages/home/Results";
 import Preguntas from "./pages/home/Questions";
 import SendImage from "./pages/home/UploadImage";
@@ -26,10 +25,9 @@ root.render(
 					<Route path="/register" element={<Register />} />
 					<Route path="/login" element={<Login />} />
 					<Route path="/leaderboard" element={<Leaderboard />} />
-					<Route path="/audio" element={<MyAudioVisualaizer />} />
 					<Route path="/results" element={<Results />} />
-					<Route path="/questions" element={<Preguntas/>}/>
-					<Route path="/image" element={<SendImage/>}/>
+					<Route path="/questions" element={<Preguntas />} />
+					<Route path="/image" element={<SendImage />} />
 				</Route>
 			</Routes>
 		</ThemeProvider>
