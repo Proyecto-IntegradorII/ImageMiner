@@ -1,21 +1,19 @@
-# name: Cypress Tests
+name: Cypress Tests
 
-# on: push
+on: push
 
-# jobs:
-#   cypress-run:
-#     runs-on: ubuntu-22.04
-#     steps:
-#       - name: Checkout
-#         uses: actions/checkout@v4
-#         with:
-#           node-version: 15
+jobs:
+  cypress-run:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          node-version: 15
 
-#       - name: Cypress.io
-#         uses: cypress-io/github-action@v6.6.1
+      - name: Cypress.io
+        uses: cypress-io/github-action@v6.6.1
 
-#         with:
-#           build: npm run build
-#           start: npm start
-#         env:
-#           REACT_APP_GPT_KEY: ${{ secrets.REACT_APP_GPT_KEY }}
+        with:
+          build: npm run build
+          start: npm start
