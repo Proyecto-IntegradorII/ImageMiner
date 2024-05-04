@@ -1,29 +1,34 @@
-describe("Prueba de texto de bienvenida", () => {
-	it("Verifica la existencia del texto de bienvenida", () => {
-		cy.visit("http://localhost:3000/"); // Cambia "/"" por la URL de tu aplicación si es diferente
-		cy.contains("¡Bienvenido a NutriScan!").should("exist");
+describe("Image Miner Tests", () => {
+	beforeEach(() => {
+		cy.visit("http://localhost:3000/"); // Adjust this to the correct path of your component
 	});
-});
 
-describe("Verificación del botón 'Empezar'", () => {
-	it("Verifica que el botón 'Empezar' existe", () => {
-		// Visita la página que contiene el botón "Empezar"
-		cy.visit("http://localhost:3000/");
-
-		// Verifica que el botón "Empezar" existe en el DOM
-		cy.get("button").contains("Empezar").should("exist");
+	it("verifica que la imagen imageminer-blue aparece en la página", () => {
+		cy.get('img[src="/static/media/imageminer-blue.6c1616baa32da09b2a1d.png"]', {
+			timeout: 10000,
+		}).should("be.visible");
 	});
-});
 
-describe("Pruebas de navegación", () => {
-	it('Debería navegar a /questions al hacer clic en el botón "Empezar"', () => {
-		// Cargar la aplicación
-		cy.visit("http://localhost:3000/");
+	it("verifies that the instructions text exists", () => {
+		cy.contains(
+			"p",
+			"Ingresa el número de imágenes y el término de búsqueda para crear y descargar un dataset"
+		).should("be.visible");
+	});
 
-		// Hacer clic en el botón "Empezar"
-		cy.contains("Empezar").click();
+	it("verifies that the number input accepts numbers", () => {
+		cy.get('input[type="number"]').clear().type("123").should("have.value", "123");
+	});
 
-		// Verificar que la URL cambie a /questions
-		cy.url().should("include", "/questions");
+	it("verifies that the number input does not accept letters", () => {
+		cy.get('input[type="number"]').clear().type("abc").should("have.value", "");
+	});
+
+	it("verifies that the search term input allows text input", () => {
+		cy.get('input[type="text"]').first().clear().type("test").should("have.value", "test");
+	});
+
+	it("verifies that the submit button is present", () => {
+		cy.get(".w-10 > img").should("exist");
 	});
 });
