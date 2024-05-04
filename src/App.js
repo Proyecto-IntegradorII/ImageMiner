@@ -4,39 +4,57 @@ import axios from "axios";
 function App() {
 	const [progress, setProgress] = useState(0);
 	const [query, setQuery] = useState("");
-	const [numberOfImages, setNumberOfImages] = useState(1);
+	const [numberOfImages, setNumberOfImages] = useState(10);
 	const [loading, setLoading] = useState(false);
 	const [folderId, setFolderId] = useState(null);
-	const [isComplete, setIsComplete] = useState(false);
 
 	const ProgressBar = ({ progress }) => {
+		const roundedProgress = Math.round(progress);
 		return (
 			<div className="relative h-6 w-full rounded-lg overflow-hidden bg-gray-400">
 				<div
 					className="absolute top-0 left-0 h-full bg-gradient-to-r from-indigo-300 to-[#011b72]"
-					style={{ width: `${progress}%` }}
+					style={{ width: `${roundedProgress}%` }}
 				></div>
 				<div className="relative z-10 flex justify-center items-center h-full">
-					<span className="text-white">{`Generando (${progress}%)`}</span>
+					<span className="text-white">{`Generando (${roundedProgress}%)`}</span>
 				</div>
 			</div>
 		);
 	};
 
 	useEffect(() => {
-		const interval = setInterval(() => {
-			if (progress < 100) {
-				setProgress(progress + 5);
-			} else {
-				clearInterval(interval);
-			}
-		}, 1000);
+		if (folderId) {
+			const interval = setInterval(() => {
+				const postData = {
+					folder_id: folderId,
+				};
 
-		return () => clearInterval(interval);
-	}, [progress]);
+				axios
+					.post("https://imageminer.onrender.com/count_files", postData)
+					.then((response) => {
+						const completedImages = response.data.file_count;
+						console.log("Imagen #:", completedImages);
+						const newProgress = Math.min((completedImages / numberOfImages) * 100, 100);
+						setProgress(newProgress);
+						if (completedImages >= numberOfImages) {
+							clearInterval(interval);
+							console.log("Dataset generation complete.");
+						}
+					})
+					.catch((error) => {
+						console.error("Error fetching file count:", error);
+						clearInterval(interval);
+					});
+			}, 1000);
+
+			return () => clearInterval(interval);
+		}
+	}, [folderId, numberOfImages]);
 
 	const handleSubmit = () => {
-		setLoading(true); // Mostrar mensaje de "Cargando"
+		setLoading(true);
+		setProgress(0);
 
 		const postData = {
 			query: query,
@@ -48,7 +66,6 @@ function App() {
 			.then((response) => {
 				console.log("Response:", response.data.folder_id);
 				setFolderId(response.data.folder_id);
-				// checkImagesCount(response.data.folder_id); // Iniciar el monitoreo
 			})
 			.catch((error) => {
 				console.error("Error:", error);
@@ -103,8 +120,12 @@ function App() {
 					</div>
 
 					{/* PROGRESS BAR */}
-					{loading && <p>Cargando...</p>}
-					{!loading && progress > 0 && (
+					{loading && (
+						<p className="mt-12 text-[#011b72] font-bold animate-pulse">
+							Iniciando solicitud en el servidor...
+						</p>
+					)}
+					{!loading && folderId && (
 						<div className="flex w-full max-w-md rounded-xl mt-12 items-center justify-center bg-gray-100">
 							<ProgressBar progress={progress} />
 						</div>
