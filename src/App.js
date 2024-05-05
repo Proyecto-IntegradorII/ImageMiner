@@ -1,12 +1,15 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import axios from "axios";
 
 function App() {
 	const [progress, setProgress] = useState(0);
 	const [query, setQuery] = useState("");
-	const [numberOfImages, setNumberOfImages] = useState(10);
+	const [numberOfImages, setNumberOfImages] = useState(null);
 	const [loading, setLoading] = useState(false);
 	const [folderId, setFolderId] = useState(null);
+	// const [startDownload, setStartDownload] = useState(false);
+	const [downloaded, setDownloaded] = useState(false);
+	const numberOfImagesRef = useRef(numberOfImages);
 
 	const ProgressBar = ({ progress }) => {
 		const roundedProgress = Math.round(progress);
@@ -23,6 +26,18 @@ function App() {
 		);
 	};
 
+	const downloadZip = () => {
+		const link = document.createElement("a");
+		link.href = `https://imageminer.onrender.com/download_folder?folder_id=${folderId}`;
+		link.setAttribute("download", true);
+		// setStartDownload(true);
+		document.body.appendChild(link);
+		link.click();
+		document.body.removeChild(link);
+		setFolderId(null);
+		setDownloaded(true);
+	};
+
 	useEffect(() => {
 		if (folderId) {
 			const interval = setInterval(() => {
@@ -35,11 +50,12 @@ function App() {
 					.then((response) => {
 						const completedImages = response.data.file_count;
 						console.log("Imagen #:", completedImages);
-						const newProgress = Math.min((completedImages / numberOfImages) * 100, 100);
+						const newProgress = Math.min((completedImages / numberOfImagesRef.current) * 100, 100);
 						setProgress(newProgress);
-						if (completedImages >= numberOfImages) {
+						if (completedImages >= numberOfImagesRef.current) {
 							clearInterval(interval);
 							console.log("Dataset generation complete.");
+							downloadZip();
 						}
 					})
 					.catch((error) => {
@@ -50,11 +66,14 @@ function App() {
 
 			return () => clearInterval(interval);
 		}
-	}, [folderId, numberOfImages]);
+	}, [folderId, downloadZip]);
 
 	const handleSubmit = () => {
 		setLoading(true);
 		setProgress(0);
+		// setStartDownload(false);
+		setDownloaded(false);
+		numberOfImagesRef.current = numberOfImages;
 
 		const postData = {
 			query: query,
@@ -87,6 +106,7 @@ function App() {
 					{/* TOP TEXT */}
 					<p className="text-center mt-20 mb-8 text-lg font-bold">
 						Ingresa el número de imágenes y el término de búsqueda para crear y descargar un dataset
+						en formato ZIP
 					</p>
 					{/* INPUT */}
 					<div class="flex max-w-md w-full h-10 items-center border-2 rounded-lg  border-[#011b72]  overflow-hidden">
@@ -105,7 +125,7 @@ function App() {
 							class="bg-transparent grow border-none h-full text-gray-900 px-2 focus:outline-none "
 							type="text"
 							min="0"
-							placeholder="Ingresa un término de búsqueda"
+							placeholder="Mountains"
 							value={query}
 							onChange={(e) => setQuery(e.target.value)}
 						/>
@@ -130,6 +150,10 @@ function App() {
 							<ProgressBar progress={progress} />
 						</div>
 					)}
+					{/* {startDownload && !downloaded && (
+						<p className="mt-12 text-[#011b72] font-bold animate-pulse">Iniciando descarga...</p>
+					)} */}
+					{downloaded && <p className="mt-12 text-[#011b72] font-bold">¡Dataset descargado!</p>}
 				</div>
 			</div>
 		</div>
