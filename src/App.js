@@ -10,6 +10,7 @@ function App() {
 	// const [startDownload, setStartDownload] = useState(false);
 	const [downloaded, setDownloaded] = useState(false);
 	const numberOfImagesRef = useRef(numberOfImages);
+	const [inputError, setInputError] = useState(false);
 
 	const ProgressBar = ({ progress }) => {
 		const roundedProgress = Math.round(progress);
@@ -69,22 +70,36 @@ function App() {
 	}, [folderId, downloadZip]);
 
 	const handleSubmit = () => {
-		setLoading(true);
-		setProgress(0);
-		// setStartDownload(false);
-		setDownloaded(false);
-		numberOfImagesRef.current = numberOfImages;
+		if (!numberOfImages || !query) {
+			setFolderId(null);
+			setInputError(true);
+			setLoading(false);
+			setProgress(0);
+			setDownloaded(false);
+
+			return; // Detener la ejecución si los campos son inválidos
+		} else {
+			setInputError(false);
+
+			setLoading(true);
+			setProgress(0);
+			// setStartDownload(false);
+			setDownloaded(false);
+			numberOfImagesRef.current = numberOfImages;
+		}
 
 		const postData = {
 			query: query,
 			number_of_images: numberOfImages,
 		};
 
+		console.log("Request started");
 		axios
 			.post("https://imageminer.onrender.com/web_scrapping", postData)
 			.then((response) => {
 				console.log("Response:", response.data.folder_id);
 				setFolderId(response.data.folder_id);
+				// console.log("The user has modified the input - the process has been interrupted");
 			})
 			.catch((error) => {
 				console.error("Error:", error);
@@ -116,9 +131,10 @@ function App() {
 							type="number"
 							min="0"
 							max="1000"
-							placeholder="100"
+							placeholder="50"
 							value={numberOfImages}
 							onChange={(e) => setNumberOfImages(e.target.value)}
+							disabled={loading || folderId}
 						/>
 						{/* TEXT */}
 						<input
@@ -128,12 +144,18 @@ function App() {
 							placeholder="Mountains"
 							value={query}
 							onChange={(e) => setQuery(e.target.value)}
+							disabled={loading || folderId}
 						/>
 						{/* BUTTON */}
 						<button
 							className="w-10 h-10 flex items-center justify-end p-1"
 							type="button"
-							onClick={handleSubmit}
+							onClick={() => {
+								if (!loading && !folderId) {
+									handleSubmit();
+								}
+							}}
+							disabled={loading || folderId}
 						>
 							<img src={require("./images/download-arrow.png")} alt="Icono de descarga" />
 						</button>
@@ -153,7 +175,12 @@ function App() {
 					{/* {startDownload && !downloaded && (
 						<p className="mt-12 text-[#011b72] font-bold animate-pulse">Iniciando descarga...</p>
 					)} */}
-					{downloaded && <p className="mt-12 text-[#011b72] font-bold">¡Dataset descargado!</p>}
+					{downloaded && <p className="mt-12 text-[#011b72] font-bold">¡Dataset generado!</p>}
+					{inputError && (
+						<p className="mt-12 text-red-500 font-bold">
+							Completa los campos para crear el dataset
+						</p>
+					)}
 				</div>
 			</div>
 		</div>
