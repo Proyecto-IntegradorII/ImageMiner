@@ -12,7 +12,7 @@ describe("Image Miner Tests", () => {
 	it("verifies that the instructions text exists", () => {
 		cy.contains(
 			"p",
-			"Ingresa el número de imágenes y el término de búsqueda para crear y descargar un dataset"
+			"Ingresa el número de imágenes y el término de búsqueda para crear y descargar un dataset en formato ZIP"
 		).should("be.visible");
 	});
 
